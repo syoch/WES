@@ -1,8 +1,8 @@
 import asyncio
 import signal
 import sys
-from . import wiiu as wiiu
 from . import server as server
+from . import wiiu as wiiu
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
