@@ -33,11 +33,10 @@ async def handler(r, w):
             await asyncio.sleep(0.1)
             continue
 
-        async with handle_lock:
-            wiiu_data = await wiiu.wiiu.communicate(clie_data)
+        wiiu_data = await wiiu.wiiu.communicate(clie_data)
 
-            print("[*] >>> {}".format(hex_to_str(wiiu_data)))
-            client.writer.write(wiiu_data)
+        print("[*] >>> {}".format(hex_to_str(wiiu_data)))
+        client.writer.write(wiiu_data)
 
     print("[#] Lost connection from {} ".format(addr))
 
