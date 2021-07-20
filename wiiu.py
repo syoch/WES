@@ -14,6 +14,9 @@ async def main():
     while True:
         if wiiu.locks["communicate"].locked():
             continue
+        if not last_client:
+            continue
+
         data = wiiu.recv()
         last_client.writer.write(data)
 
