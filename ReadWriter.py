@@ -8,11 +8,15 @@ class ReadWriter():
                  writer: asyncio.StreamWriter):
         self.reader = reader
         self.writer = writer
-        self.lock = asyncio.Lock()
+        self.locks = {
+            "_recv": asyncio.Lock(),
+            "recv": asyncio.Lock(),
+            "communicate": asyncio.Lock(),
+        }
 
     async def _recv(self):
         try:
-            async with self.lock:
+            async with self.locks["_recv"]:
                 return await asyncio.wait_for(self.reader.read(8192), 0.1)
         except asyncio.TimeoutError:
             return -1
@@ -20,19 +24,20 @@ class ReadWriter():
     async def recv(self, timeout=0.05):
         ret = b""
         prev = time()
-        while time() - prev < timeout:  # do not come a data during 'timeout'(seconds) to exit loop
-            chunk = await self._recv()
-            if not chunk:  # disconnected
-                self.writer.close()
-                break
+        async with self.locks["recv"]:
+            while time() - prev < timeout:  # do not come a data during 'timeout'(seconds) to exit loop
+                chunk = await self._recv()
+                if not chunk:  # disconnected
+                    self.writer.close()
+                    break
 
-            if chunk != -1:  # recv some data
-                prev = time()
-                ret += chunk
+                if chunk != -1:  # recv some data
+                    prev = time()
+                    ret += chunk
         return ret
 
     async def communicate(self, data):
-        async with self.lock:
+        async with self.locks["communicate"]:
             self.writer.write(data)
             await self.writer.drain()
             return await self.recv()
