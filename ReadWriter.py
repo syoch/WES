@@ -36,4 +36,5 @@ class ReadWriter():
     async def communicate(self, data):
         self.writer.write(data)
         await self.writer.drain()
+        await asyncio.sleep(0.1)
         return await self.recv()
