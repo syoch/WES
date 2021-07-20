@@ -1,4 +1,5 @@
 import asyncio
+from time import time
 
 
 class ReadWriter():
@@ -18,19 +19,16 @@ class ReadWriter():
 
     async def recv(self, timeout=0.2):
         ret = b""
-        await asyncio.sleep(timeout)
-        while True:  # return when do not sent a data while 'timeout'(sec)
+        prev = time()
+        while time() - prev < timeout:  # do not come a data during 'timeout'(seconds) to exit loop
             chunk = await self._recv()
             if not chunk:  # disconnected
                 self.writer.close()
                 break
+
             if chunk != -1:  # recv some data
+                prev = time()
                 ret += chunk
-            else:  # not data -> timeout
-                break
-
-            await asyncio.sleep(timeout)
-
         return ret
 
     async def communicate(self, data):
