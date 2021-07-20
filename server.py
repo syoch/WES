@@ -36,3 +36,7 @@ async def main():
         for sock in server.sockets
     ]))
     await server.serve_forever()
+
+
+def exit():
+    server.close()

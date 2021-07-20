@@ -18,8 +18,8 @@ def main():
             server.main()
         ))
     finally:
-        wiiu.writer.close()
-        server.close()
+        wiiu.exit()
+        server.exit()
 
 
 if __name__ == "__main__":

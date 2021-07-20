@@ -10,3 +10,7 @@ async def main():
     (r, w) = await asyncio.open_connection(sys.argv[1], int(sys.argv[2]))
     wiiu = ReadWriter(r, w)
     print("[*] Successfully connected to Wii U Server!")
+
+
+def exit():
+    wiiu.writer.close()
