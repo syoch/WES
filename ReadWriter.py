@@ -17,7 +17,7 @@ class ReadWriter():
         except asyncio.TimeoutError:
             return -1
 
-    async def recv(self, timeout=0.2):
+    async def recv(self, timeout=0.05):
         ret = b""
         prev = time()
         while time() - prev < timeout:  # do not come a data during 'timeout'(seconds) to exit loop
@@ -35,5 +35,4 @@ class ReadWriter():
         async with self.lock:
             self.writer.write(data)
             await self.writer.drain()
-            await asyncio.sleep(0.1)
             return await self.recv()
