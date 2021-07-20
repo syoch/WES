@@ -5,6 +5,14 @@ from . import wiiu
 handle_lock = asyncio.Lock()
 
 
+def hex_to_str(raw: bytes):
+    msg = raw.hex()
+    if len(msg) > 80:
+        msg = msg[0:80]
+        msg += "...more than {}bytes".format(len(raw)-40)
+    return msg
+
+
 async def handler(r, w):
     global handle_lock
 
@@ -16,7 +24,7 @@ async def handler(r, w):
         clie_data = await client.recv()
         if not clie_data:
             continue
-        print("[*] <<< {}".format(clie_data.hex()))
+        print("[*] <<< {}".format(hex_to_str(clie_data)))
 
         if clie_data[0] == 0x05 and int.from_bytes(clie_data[1:5], "big") < 0x010000000:
             print("[*] --> b0 (memory protect)")
@@ -28,7 +36,7 @@ async def handler(r, w):
         async with handle_lock:
             wiiu_data = await wiiu.wiiu.communicate(clie_data)
 
-            print("[*] >>> {}".format(wiiu_data.hex()))
+            print("[*] >>> {}".format(hex_to_str(wiiu_data)))
             client.writer.write(wiiu_data)
 
     print("[#] Lost connection from {} ".format(addr))
