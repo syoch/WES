@@ -2,8 +2,6 @@ import asyncio
 from .ReadWriter import ReadWriter
 from . import wiiu
 
-handle_lock = asyncio.Lock()
-
 
 def hex_to_str(raw: bytes):
     msg = raw.hex()
@@ -14,7 +12,6 @@ def hex_to_str(raw: bytes):
 
 
 async def handler(r, w):
-    global handle_lock
 
     client = ReadWriter(r, w)
     addr = client.writer.get_extra_info("peername")
@@ -30,7 +27,6 @@ async def handler(r, w):
             print("[*] --> b0 (memory protect)")
             client.writer.write(b"\xb0")
             await client.writer.drain()
-            await asyncio.sleep(0.1)
             continue
 
         wiiu_data = await wiiu.wiiu.communicate(clie_data)
