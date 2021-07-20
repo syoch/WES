@@ -11,8 +11,11 @@ def hex_to_str(raw: bytes):
     return msg
 
 
-async def handler(r, w):
+last_client: ReadWriter = None
 
+
+async def handler(r, w):
+    global last_client
     client = ReadWriter(r, w)
     addr = client.writer.get_extra_info("peername")
 
@@ -30,7 +33,8 @@ async def handler(r, w):
             continue
 
         wiiu_data = await wiiu.wiiu.communicate(clie_data)
-
+        if not wiiu_data:
+            last_client = client
         print("[*] >>> {}".format(hex_to_str(wiiu_data)))
         client.writer.write(wiiu_data)
 
