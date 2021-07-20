@@ -43,6 +43,7 @@ async def handler(r, w):
 
 async def main():
     global server
+    print("[*] Server is Listening at :7331...")
     server = await asyncio.start_server(handler, "", 7331)
     print("[*] Server is listening at {}".format([
         sock.getsockname()
