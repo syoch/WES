@@ -11,17 +11,20 @@ async def main():
     wiiu = ReadWriter(r, w)
     print("[*] Successfully connected to Wii U Server!")
 
-    from .server import last_client
+    from . import server
     while True:
         await asyncio.sleep(0.1)
         if wiiu.locks["communicate"].locked():
             continue
-        if not last_client:
+        if not server.last_client:
             continue
 
-        data = wiiu.recv()
-        last_client.writer.write(data)
+        data = await wiiu._recv()
+        if data == -1:
+            continue
+        server.last_client.writer.write(data)
 
 
 def exit():
-    wiiu.writer.close()
+    if wiiu:
+        wiiu.writer.close()
