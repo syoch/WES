@@ -23,6 +23,7 @@ async def main():
         if data == -1:
             continue
         server.last_client.writer.write(data)
+        print("[!] >>> {}".format(data))
 
 
 def exit():
