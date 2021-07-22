@@ -9,17 +9,14 @@ class ReadWriter():
         self.reader = reader
         self.writer = writer
         self.locks = {
-            "_recv": asyncio.Lock(),
             "recv": asyncio.Lock(),
             "communicate": asyncio.Lock(),
         }
 
     async def _recv(self):
-        try:
-            async with self.locks["_recv"]:
-                return await asyncio.wait_for(self.reader.read(8192), 0.1)
-        except asyncio.TimeoutError:
+        if self.reader.at_eof():
             return -1
+        return await self.reader.read(8192)
 
     async def recv(self, timeout=0.05):
         ret = b""
